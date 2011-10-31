@@ -14,7 +14,7 @@ class BookmarkInstanceForm(forms.ModelForm):
         self.user = user
         super(BookmarkInstanceForm, self).__init__(*args, **kwargs)
         # hack to order fields
-        self.fields.keyOrder = ["url", "description", "note", "redirect"]
+        self.fields.keyOrder = ["url", "description", "redirect"]
     
     def clean(self):
         if "url" not in self.cleaned_data:
@@ -35,3 +35,8 @@ class BookmarkInstanceForm(forms.ModelForm):
     
     class Meta:
         model = BookmarkInstance
+        fields = [
+            "url",
+            "description",
+            "redirect"
+        ]
