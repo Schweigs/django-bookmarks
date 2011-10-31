@@ -1,0 +1,16 @@
+=========
+CHANGELOG
+=========
+
+0.2
+---
+
+* Removed django-voting (should use agon for voting on objects instead)
+* Removed Feed
+* Changed out django-tagging for django-taggit
+
+
+0.1
+---
+
+Initial release
