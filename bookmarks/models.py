@@ -67,7 +67,7 @@ class BookmarkInstance(models.Model):
     tags = TaggableManager()
     
     def save(self, force_insert=False, force_update=False):
-        if hasattr(self, 'url'):
+        if getattr(self, 'url', None):
             try:
                 bookmark = Bookmark.objects.get(url=self.url)
             except Bookmark.DoesNotExist:
