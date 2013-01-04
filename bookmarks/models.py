@@ -67,13 +67,14 @@ class BookmarkInstance(models.Model):
     tags = TaggableManager()
     
     def save(self, force_insert=False, force_update=False):
-        try:
-            bookmark = Bookmark.objects.get(url=self.url)
-        except Bookmark.DoesNotExist:
-            # has_favicon=False is temporary as the view for adding bookmarks will change it
-            bookmark = Bookmark(url=self.url, description=self.description, note=self.note, has_favicon=False, adder=self.user)
-            bookmark.save()
-        self.bookmark = bookmark
+        if getattr(self, 'url', None):
+            try:
+                bookmark = Bookmark.objects.get(url=self.url)
+            except Bookmark.DoesNotExist:
+                # has_favicon=False is temporary as the view for adding bookmarks will change it
+                bookmark = Bookmark(url=self.url, description=self.description, note=self.note, has_favicon=False, adder=self.user)
+                bookmark.save()
+            self.bookmark = bookmark
         super(BookmarkInstance, self).save(force_insert, force_update)
     
     def delete(self):
