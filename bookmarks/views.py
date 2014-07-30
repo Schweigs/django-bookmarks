@@ -1,5 +1,4 @@
 import datetime
-import urllib2
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -47,25 +46,11 @@ def add(request):
             bookmark_instance.user = request.user
             bookmark_instance.save()
             bookmark = bookmark_instance.bookmark
-            
-            try:
-                headers = {
-                    "Accept" : "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
-                    "Accept-Language" : "en-us,en;q=0.5",
-                    "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
-                    "Connection" : "close",
-                    ##"User-Agent": settings.URL_VALIDATOR_USER_AGENT
-                    }
-                req = urllib2.Request(bookmark.get_favicon_url(force=True), None, headers)
-                urllib2.urlopen(req)
-                has_favicon = True
-            except:
-                has_favicon = False
-            
-            bookmark.has_favicon = has_favicon
-            bookmark.favicon_checked = datetime.datetime.now() 
+
+            bookmark.has_favicon = bookmark.favicon_available()
+            bookmark.favicon_checked = datetime.datetime.now()
             bookmark.save()
-            
+
             if bookmark_form.should_redirect():
                 return HttpResponseRedirect(bookmark.url)
             else:
@@ -83,15 +68,17 @@ def add(request):
             initial["description"] = request.GET["description"].strip()
         if "redirect" in request.GET:
             initial["redirect"] = request.GET["redirect"]
-        
+
         if initial:
             bookmark_form = BookmarkInstanceForm(initial=initial)
         else:
             bookmark_form = BookmarkInstanceForm()
-    
+
     bookmarks_add_url = "http://" + Site.objects.get_current().domain + reverse("add_bookmark")
-    bookmarklet = "javascript:location.href='%s?url='+encodeURIComponent(location.href)+';description='+encodeURIComponent(document.title)+';redirect=on'" % bookmarks_add_url
-    
+    bookmarklet = ("javascript:location.href='%s?url='+encodeURIComponent(location.href)+';"
+                   "description='+encodeURIComponent(document.title)+';redirect=on'"
+                   % bookmarks_add_url)
+
     return render_to_response("bookmarks/add.html", {
         "bookmarklet": bookmarklet,
         "bookmark_form": bookmark_form,
@@ -107,10 +94,10 @@ def delete(request, bookmark_instance_id):
     if request.user == bookmark_instance.user:
         bookmark_instance.delete()
         request.user.message_set.create(message="Bookmark Deleted")
-    
+
     if "next" in request.GET:
         next = request.GET["next"]
     else:
         next = reverse("all_bookmarks")
-    
+
     return HttpResponseRedirect(next)
