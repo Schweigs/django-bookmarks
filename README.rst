@@ -1,5 +1,6 @@
 Django Bookmarks
-----------------
+===================
+
 .. image:: http://slack.pinaxproject.com/badge.svg
    :target: http://slack.pinaxproject.com/
    
